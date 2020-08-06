@@ -19,11 +19,11 @@ class RallyExportTool:
         self.USERNAME = None
         self.PASSWORD = None
         self.API_KEY = None
-        self.WORKSPACE = "New York Life Insurance Company"
-        self.PROJECT = ""
         self.WORKSPACE_LIST = []
         self.PROJECT_LIST = []
         self.config_object = config
+        self.WORKSPACE = self.config_object['CREDENTIALS']['WORKSPACE']
+        self.PROJECT = self.config_object['CREDENTIALS']['PROJECT']
 
     def cleanhtml(self, raw_html):
         cleanr = re.compile('<.*?>')
@@ -153,16 +153,16 @@ class RallyExportTool:
                 print("Login 1")
                 self.API_KEY = self.config_object['CREDENTIALS']["API_KEY"]
                 self.RALLY = Rally(server="rally1.rallydev.com", apikey=self.API_KEY,
-                            workspace=self.WORKSPACE, warn=True)
+                            workspace=self.WORKSPACE, project=self.PROJECT, warn=True)
             else:
                 print("Login 2")
                 self.RALLY = Rally(server="rally1.rallydev.com", username=self.USERNAME, password=self.PASSWORD,
-                                    workspace=self.WORKSPACE, warn=True)
+                                    workspace=self.WORKSPACE, project=self.PROJECT, warn=True)
 
             self.WORKSPACE_LIST = list(map(lambda x: x.Name, self.RALLY.getWorkspaces()))
 
             project_list = []
-            print(self.WORKSPACE_LIST)
+            
             for wksp in self.WORKSPACE_LIST:
                 projects = self.RALLY.getProjects(workspace=wksp)
                 for proj in projects:
@@ -170,8 +170,16 @@ class RallyExportTool:
 
             self.PROJECT_LIST = project_list
 
+            print("WORKSPACES + PROJECTS")
+            print(self.WORKSPACE_LIST)
+            print(self.PROJECT_LIST)
+
+
             return True
         except Exception as e:
+            print("WORKSPACES + PROJECTS")
+            print(self.WORKSPACE_LIST)
+            print(self.PROJECT_LIST)
             print(e)
             return False
 
