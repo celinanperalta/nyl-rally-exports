@@ -11,16 +11,14 @@ quick_reports = {
         # Queries are written as lambda functions (lambda data: data) to filter over dataframes returned from Rally API calls.
         # Some basic Python knowledge is needed to write your own custom queries. Fields are case-sensitive and referenced by data['field_name'].
         
-        "headers": ["Feature", "Feature.Name", "FormattedID", "Name", "Owner", "Tags", "Milestones", "PlanEstimate", "AcceptanceCriteria", "Iteration", "ScheduleState", "AgencyKanban", "Blocked"],
+        "headers": ["Feature", "Feature.Name", "FormattedID", "Name", "Owner", "Tags", "Milestones", "PlanEstimate", "c_AcceptanceCriteria", "Iteration", "ScheduleState", "c_AgencyKanban", "Blocked"],
         "custom_reports": {
             # Find user stories that have missing iteration, plan estimate, or acceptance criteria
             "user_story_default": {
-                "headers": ["Feature", "Feature.Name", "FormattedID", "Name", "Owner", "Tags", "Milestones", "PlanEstimate", "AcceptanceCriteria", "Iteration", "ScheduleState", "AgencyKanban", "Blocked"],
+                "headers": ["Feature", "Feature.Name", "FormattedID", "Name", "Owner", "Tags", "Milestones", "PlanEstimate", "c_AcceptanceCriteria", "Iteration", "ScheduleState", "c_AgencyKanban", "Blocked"],
                 "query_custom": ["Milestones.Name = \"$\""],
                 "query" : lambda data: (data["ScheduleState"] != "Idea" and data["Blocked"] != True and not data["Name"].startswith("Integration")) and ((data["PlanEstimate"] is None or data["AcceptanceCriteria"] is None or data["Iteration"] is None) or (data["ScheduleState"] != "Defined" and ("PO Signed Off" not in data["Tags"])))
-                
             },
-            #merge po sign off and missing criteria
             "po_signed_off": {
                 "headers": ["Feature", "Feature.Name", "FormattedID", "Name", "Owner", "Tags", "Milestones", "PlanEstimate", "AcceptanceCriteria", "Iteration", "ScheduleState", "AgencyKanban", "Blocked"],
                 "query_custom": ["Milestones.Name = \"$\""],

@@ -44,7 +44,7 @@ class RallyExportTool:
             return val.__dict__.get("Name", "")
         elif key in ["CreationDate", "LastUpdateDate"]:
             return val.split('T')[0]
-        elif key == "AcceptanceCriteria":
+        elif "AcceptanceCriteria" in key:
             return self.cleanhtml(val)
         else:
             return val
