@@ -5,6 +5,11 @@ quick_reports = {
         # Columns to appear in Rally export. Note that some attributes are returned as objects (ex: Feature)
         # The artifact must be fetched on its own, then further attributes must be included as Artifact.Attribute to appear in the report.
         # A full list of artifacts and attributes can be found in the pyral documentation
+
+        # The query_custom field should be used to customize parameters that can be changed by the user.
+
+        # Queries are written as lambda functions (lambda data: data) to filter over dataframes returned from Rally API calls.
+        # Some basic Python knowledge is needed to write your own custom queries. Fields are case-sensitive and referenced by data['field_name'].
         
         "headers": ["Feature", "Feature.Name", "FormattedID", "Name", "Owner", "Tags", "Milestones", "PlanEstimate", "AcceptanceCriteria", "Iteration", "ScheduleState", "AgencyKanban", "Blocked"],
         "custom_reports": {
@@ -12,20 +17,19 @@ quick_reports = {
             "user_story_default": {
                 "headers": ["Feature", "Feature.Name", "FormattedID", "Name", "Owner", "Tags", "Milestones", "PlanEstimate", "AcceptanceCriteria", "Iteration", "ScheduleState", "AgencyKanban", "Blocked"],
                 "query_custom": ["Milestones.Name = \"$\""],
-                "query": ["ScheduleState != Idea", "Blocked != True", "Name !contains Integration",
-                          "PlanEstimate = null OR AcceptanceCriteria = null OR Iteration = null OR ScheduleState != Defined AND Tags.Name !contains \"PO Signed off\""]
+                "query" : lambda data: (data["ScheduleState"] != "Idea" and data["Blocked"] != True and not data["Name"].startswith("Integration")) and ((data["PlanEstimate"] is None or data["AcceptanceCriteria"] is None or data["Iteration"] is None) or (data["ScheduleState"] != "Defined" and ("PO Signed Off" not in data["Tags"])))
                 
             },
             #merge po sign off and missing criteria
             "po_signed_off": {
                 "headers": ["Feature", "Feature.Name", "FormattedID", "Name", "Owner", "Tags", "Milestones", "PlanEstimate", "AcceptanceCriteria", "Iteration", "ScheduleState", "AgencyKanban", "Blocked"],
                 "query_custom": ["Milestones.Name = \"$\""],
-                "query": ["ScheduleState != Idea", "ScheduleState != Defined", "Blocked != True", "Tags.Name !contains \"PO Signed off\""],
+                "query" : lambda data: data
             },
             "testcases": {
                 "headers": ["Feature", "Feature.Name", "FormattedID", "Name", "Owner", "Tags", "Milestones", "PlanEstimate", "AcceptanceCriteria", "Iteration", "ScheduleState", "AgencyKanban", "Blocked", "TestCaseCount", "PassingTestCaseCount"],
                 "query_custom": ["Milestones.Name = \"$\"", "Feature.FormattedID = $"],
-                "query": []
+                "query": lambda data: data
             }
         }
     },
@@ -33,9 +37,9 @@ quick_reports = {
         "headers": ['FormattedID', 'Name', 'Priority', 'State', 'SubmittedBy', 'Owner', 'Blocked', 'LastUpdateDate', 'CreationDate', 'Aging', 'Range'],
         "custom_reports": {
             "report1": {
-                "headers": ['FormattedID', 'Name', 'Priority', 'State', 'SubmittedBy', 'Owner', 'Blocked', 'LastUpdateDate', 'CreationDate', 'Aging', 'Range'],
+                "headers": ['FormattedID', 'Name', 'Priority', 'State', 'SubmittedBy', 'ProjectPhase', 'Release', 'Owner', 'Blocked', 'LastUpdateDate', 'CreationDate', 'Aging', 'Range'],
                 "query_custom": ["Release.Name = \"$\"", "ProjectPhase != \"$\""],
-                "query" : ["State != Closed"]
+                "query" : lambda data: data["State"] != "Closed"
             }
         }
 

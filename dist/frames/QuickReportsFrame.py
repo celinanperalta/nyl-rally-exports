@@ -203,8 +203,10 @@ class QuickReportsFrame(Frame):
 
     def handle_submit(self):
         artifact = qr.quick_reports[self.export_option.get()].copy()
-        query = artifact["custom_reports"][self.quick_report.get()]["query"].copy()
+        # query = artifact["custom_reports"][self.quick_report.get()]["query"].copy()
+        query = []
         headers = artifact["custom_reports"][self.quick_report.get()]['headers'].copy()
+        df_query = artifact["custom_reports"][self.quick_report.get()]['query']
         
         for key, val in self.custom_query_fields.items():
             if (val.get() == ""):
@@ -215,7 +217,8 @@ class QuickReportsFrame(Frame):
 
         print("Query: " + str(query))
         
-        path = self.controller.RALLY.get_exports_custom_fetch(self.export_option.get(), headers, query, self.row_limit.get(), self.order_by.get().replace(" ", "") + (" desc" if self.desc.get() == 1 else ""))
+        path = self.controller.RALLY.get_exports_custom_fetch(self.export_option.get(), headers, query, self.row_limit.get(), self.order_by.get().replace(" ", "") + (" desc" if self.desc.get() == 1 else ""), df_query)
+        
         if self.to_excel.get() == 1 and path is not None:
             read_file, writer, workbook, worksheet = self.controller.RALLY_REPORTER.csv_to_excel(path)
             macros.highlight_missing(df=read_file, writer=writer, workbook=workbook, worksheet=worksheet)

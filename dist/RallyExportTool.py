@@ -49,7 +49,7 @@ class RallyExportTool:
         else:
             return val
 
-    def get_data(self, data_type, headers, csv_dest, query="", limit=200, order=""):
+    def get_data(self, data_type, headers, csv_dest, query="", limit=200, order="", df_query=None):
 
         print(data_type)
         print(headers)
@@ -112,8 +112,12 @@ class RallyExportTool:
         else:
             base_path = Path(self.config_object["CREDENTIALS"]["export_directory"]) / "rally-data" / "csv_files"
             path = base_path / csv_dest
-            df.to_csv(Path(path), index=False)
-            messagebox.showinfo(message=str(count) + " " + data_type + " rows loaded in " + str(path))
+
+            new_df = df
+            if df_query is not None:
+                new_df = df[df.apply(df_query, axis=1)]
+            new_df.to_csv(Path(path), index=False)
+            messagebox.showinfo(message=str(len(new_df.index)) + " " + data_type + " rows loaded in " + str(path))
             return path
 
 
@@ -122,10 +126,10 @@ class RallyExportTool:
             return self.get_data(data_type=data_type, headers=self.config_object.getlist('DEFAULT_FIELDS', data_type),
                           csv_dest=data_type + "_" + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S") + ".csv", query=query, limit=limit, order=order)
             
-    def get_exports_custom_fetch(self, data_type, headers, query, limit, order):
+    def get_exports_custom_fetch(self, data_type, headers, query, limit, order, df_query=None):
             print(self.RALLY.getProject())
             return self.get_data(data_type=data_type, headers=headers,
-                          csv_dest=data_type + "_" + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S") + ".csv", query=query, limit=limit, order=order)
+                          csv_dest=data_type + "_" + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S") + ".csv", query=query, limit=limit, order=order, df_query=df_query)
 
     def get_workspaces(self):
         return self.WORKSPACE_LIST
